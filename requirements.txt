@@ -1,0 +1,8 @@
+streamlit>=1.33
+torch
+torchvision
+timm
+grad-cam
+Pillow
+numpy
+matplotlib
