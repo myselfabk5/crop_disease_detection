@@ -37,7 +37,7 @@ A lightweight AI-powered crop disease diagnosis system that combines **disease c
 ## Installation
 
 ```bash
-git clone git clone https://github.com/myselfabk5/crop_disease_detection.git
+git clone https://github.com/myselfabk5/crop_disease_detection.git
 cd crop_disease_detection
 
 pip install -r requirements.txt
