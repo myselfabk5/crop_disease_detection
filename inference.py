@@ -11,7 +11,7 @@ Tune this if you recalibrate the autoencoder on new data.
 
 import torch.nn.functional as F
 
-OOD_THRESHOLD = 0.015
+OOD_THRESHOLD = 0.01
 
 
 def autoencoder_reconstruction_loss(autoencoder_model, img_tensor, device):

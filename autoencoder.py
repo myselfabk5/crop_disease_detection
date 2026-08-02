@@ -1,4 +1,5 @@
 import torch.nn as nn
+latent_dim = 32
 #--------------------------------------------------------------------------
 # Autoencoder architecture (must match training-time definition exactly)
 # --------------------------------------------------------------------------
@@ -52,7 +53,7 @@ class Decoder(nn.Module):
 
 
 class AutoEncoder(nn.Module):
-    def __init__(self, latent_dim=64):
+    def __init__(self, latent_dim):
         super().__init__()
         self.encoder = Encoder(latent_dim)
         self.decoder = Decoder(latent_dim)

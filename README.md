@@ -1,48 +1,57 @@
-# Crop Disease Prediction and Treatment — Streamlit Dashboard
+# 🌱 Lightweight Crop Disease Detection System
 
-## Folder structure
+A lightweight AI-powered crop disease diagnosis system that combines **disease classification**, **out-of-distribution (OOD) detection**, **Grad-CAM explainability**, and **verified treatment recommendations** for reliable agricultural decision support.
+
+## Features
+
+- 🌿 Disease classification using fine-tuned **EfficientNet-B0**
+- 🚫 Out-of-Distribution (OOD) detection using a convolutional autoencoder
+- 🔍 Grad-CAM visualizations for model interpretability
+- 📖 Verified treatment recommendations from a curated knowledge base
+- 💻 Interactive web interface built with **Streamlit**
+
+## Model Performance
+
+| Metric | Value |
+|--------|------:|
+| Validation Accuracy | **89.64%** |
+| Test Accuracy | **89.45%** |
+| OOD Detection AUROC | **0.8183** |
+
+## Dataset
+
+- 94 crop disease classes
+- 13 crop species
+- Dataset: https://huggingface.co/datasets/Saon110/bd-crop-vegetable-plant-disease-dataset
+
+## Tech Stack
+
+- Python
+- PyTorch
+- EfficientNet-B0
+- OpenCV
+- Streamlit
+- Grad-CAM
+
+## Repository Structure
 
 ```
-crop_disease_app/
-│
-├── app.py                  # Streamlit dashboard (entry point)
-├── models.py                # Model architecture + cached loaders
-├── inference.py              # OOD check + CNN prediction pipeline
-├── explainability.py         # Grad-CAM
-├── knowledge_base.py         # Disease information retrieval
-├── templates.py              # 10 report templates
-├── utils.py                  # Image reading & transforms
-├── requirements.txt
-│
-├── models/
-│     ├── cnn_model.pth              # full pickled EfficientNet-B0 model
-│     └── autoencoder.pth            # full pickled AutoEncoder model
-│
-├── data/                            # ⚠️ NOT in your original folder list — add this
-│     ├── label_mapping.json         # {"0": "class_key", "1": "...", ...}
-│     └── crop_disease_knowledge_base.json   # {"class_key": {...}, ...}
-│
-└── assets/
-      └── logo.png
+├── app.py                 # Streamlit application
+├── models/                # Trained model weights
+├── utils/                 # Utility functions
+├── data/                  # Dataset (not included)
+├── images/                # Screenshots
+└── requirements.txt
 ```
 
-> **Note:** your original folder list didn't include the `label_mapping.json`
-> and knowledge-base JSON files used by `information_retrieval()` in the
-> notebook. Add a `data/` folder (as above) with those two files, or edit
-> the paths at the top of `knowledge_base.py` to point wherever you keep them.
-
-## Install
+## Installation
 
 ```bash
-cd crop_disease_app
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+git clone <repository-url>
+cd <repository-name>
+
 pip install -r requirements.txt
 ```
-
-`timm` is required even though it isn't imported directly — the CNN model
-was saved as a full pickled object built on a `timm` EfficientNet-B0
-backbone, and unpickling it requires the same library to be installed.
 
 ## Run
 
@@ -50,23 +59,10 @@ backbone, and unpickling it requires the same library to be installed.
 streamlit run app.py
 ```
 
-## App flow
+## Citation
 
-1. **Upload** — choose "Upload from device" or "Use camera", then provide a leaf image.
-2. **Automatic OOD check** — the autoencoder computes a reconstruction loss.
-   - If the image looks in-distribution → the app proceeds straight to prediction.
-   - If it looks out-of-distribution → a warning is shown with **Yes/No** buttons.
-     - **No** → the app resets to a fresh upload state.
-     - **Yes** → the app proceeds anyway (result flagged as potentially unreliable).
-3. **Prediction** — the CNN model predicts crop + disease + confidence.
-4. **Explainability** — two images are shown: original vs. Grad-CAM heatmap overlay.
-5. **Report** — one of 10 templated reports is generated from the knowledge base,
-   viewable on-screen and downloadable as `.txt`.
+If you use this work, please cite the accompanying project report.
 
-## Tuning
+## License
 
-- `inference.OOD_THRESHOLD` (default `0.015`) controls the OOD cutoff — same
-  value used in the original notebook. Recalibrate if you retrain the autoencoder.
-- Model loading is cached with `st.cache_resource`, so the ~2 models load
-  once per server process, not on every image.
-- Knowledge base / label mapping JSON files are cached with `st.cache_data`.
+This project is intended for educational and research purposes.

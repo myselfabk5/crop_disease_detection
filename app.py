@@ -16,9 +16,10 @@ Flow:
 """
 
 from pathlib import Path
-
 import streamlit as st
-import torch.nn as nn
+from autoencoder import AutoEncoder
+from autoencoder import Encoder
+from autoencoder import Decoder
 from explainability import run_explainability
 from inference import run_prediction, run_ood_check
 from knowledge_base import information_retrieval
@@ -29,6 +30,7 @@ from utils import cnn_transform, image_transform, read_crop_image
 BASE_DIR = Path(__file__).resolve().parent
 LOGO_PATH = BASE_DIR / "assets" / "logo.png"
 print(BASE_DIR)
+
 st.set_page_config(
     page_title="Crop Disease Prediction and Treatment",
     page_icon="🌿",
@@ -39,70 +41,6 @@ st.set_page_config(
 
 
 
- #--------------------------------------------------------------------------
-# Autoencoder architecture (must match training-time definition exactly)
-# --------------------------------------------------------------------------
-class Encoder(nn.Module):
-    def __init__(self, latent_dim):
-        super().__init__()
-
-        self.conv = nn.Sequential(
-            nn.Conv2d(3, 32, 3, stride=2, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(32, 64, 3, stride=2, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(64, 128, 3, stride=2, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(128, 256, 3, stride=2, padding=1),
-            nn.ReLU(),
-        )
-
-        self.flatten = nn.Flatten()
-        self.fc = nn.Linear(256 * 14 * 14, latent_dim)
-
-    def forward(self, x):
-        x = self.conv(x)
-        x = self.flatten(x)
-        z = self.fc(x)
-        return z
-
-
-class Decoder(nn.Module):
-    def __init__(self, latent_dim):
-        super().__init__()
-
-        self.fc = nn.Linear(latent_dim, 256 * 14 * 14)
-
-        self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(256, 128, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
-            nn.ConvTranspose2d(32, 3, kernel_size=4, stride=2, padding=1),
-            nn.Sigmoid(),
-        )
-
-    def forward(self, z):
-        x = self.fc(z)
-        x = x.view(-1, 256, 14, 14)
-        x = self.decoder(x)
-        return x
-
-
-class AutoEncoder(nn.Module):
-    def __init__(self, latent_dim=64):
-        super().__init__()
-        self.encoder = Encoder(latent_dim)
-        self.decoder = Decoder(latent_dim)
-
-    def forward(self, x):
-        z = self.encoder(x)
-        reconstruction = self.decoder(z)
-        return reconstruction
-
-
 # --------------------------------------------------------------------------
 # Styling
 # --------------------------------------------------------------------------
@@ -110,7 +48,7 @@ st.markdown(
     """
     <style>
         .main { background-color: #f7faf7; }
-        .block-container { padding-top: 2rem; padding-bottom: 3rem; }
+        .block-container { padding-top: 4rem; padding-bottom: 3rem; }
 
         .app-title { font-size: 2rem; font-weight: 700; color: #1b5e20; margin-bottom: 0; }
         .app-subtitle { font-size: 1rem; color: #4b5563; margin-top: 0.2rem; margin-bottom: 1.5rem; }
@@ -189,7 +127,7 @@ cnn_model, cnn_device = load_cnn_model()
 # --------------------------------------------------------------------------
 def run_full_pipeline(pil_image):
     """Runs prediction + explainability + knowledge base retrieval + report."""
-    with st.spinner("Analyzing the leaf and predicting the disease..."):
+    with st.spinner("Analyzing and predicting the disease..."):
         predicted_class, confidence, cnn_img_tensor = run_prediction(
             pil_image, cnn_model, cnn_device, cnn_transform
         )
@@ -223,13 +161,13 @@ with st.sidebar:
     st.markdown("### 🌿 About")
     st.write(
         "This tool uses a deep learning model to identify crop diseases from "
-        "a leaf image, explains its decision visually, and suggests organic "
+        "a crop image, explains its decision visually, and suggests organic "
         "and chemical treatment options from a curated knowledge base."
     )
     st.markdown("---")
     st.write(
         "**How it works:**\n"
-        "1. Upload a leaf image\n"
+        "1. Upload a crop image\n"
         "2. Automatic quality/relevance check\n"
         "3. Disease prediction & confidence\n"
         "4. Visual explanation (Grad-CAM)\n"
@@ -246,7 +184,7 @@ with st.sidebar:
 # --------------------------------------------------------------------------
 st.markdown('<p class="app-title">Crop Disease Prediction and Treatment</p>', unsafe_allow_html=True)
 st.markdown(
-    '<p class="app-subtitle">Upload a photo of a crop leaf to get an instant disease diagnosis, '
+    '<p class="app-subtitle">Upload a photo of a crop to get an instant disease diagnosis, '
     "a visual explanation of the model's decision, and treatment guidance.</p>",
     unsafe_allow_html=True,
 )
@@ -260,7 +198,7 @@ with tab:
     # ----------------------------------------------------------------
     if st.session_state.stage == "await_upload":
         st.markdown('<div class="section-card">', unsafe_allow_html=True)
-        st.subheader("Step 1 · Upload a leaf image")
+        st.subheader("Step 1 · Upload an image")
 
         input_method = st.radio(
             "Choose how you'd like to provide the image:",
@@ -271,11 +209,11 @@ with tab:
         uploaded_file = None
         if input_method == "📁 Upload from device":
             uploaded_file = st.file_uploader(
-                "Upload a clear image of the affected crop leaf",
+                "Upload a clear image of the affected crop",
                 type=["jpg", "jpeg", "png"],
             )
         else:
-            uploaded_file = st.camera_input("Take a photo of the crop leaf")
+            uploaded_file = st.camera_input("Take a photo of the crop")
 
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -316,7 +254,7 @@ with tab:
                 f"""
                 <div class="ood-warning">
                 <b>⚠️ This image looks out-of-distribution.</b><br><br>
-                The uploaded image doesn't closely resemble the crop leaf images the
+                The uploaded image doesn't closely resemble the crop images the
                 model was trained on (reconstruction error: <b>{st.session_state.ood_loss:.4f}</b>).
                 If you proceed, the disease prediction and confidence score
                 <b>may not be reliable</b>.
