@@ -51,7 +51,17 @@ streamlit run app.py
 
 ## Citation
 
-If you use this work, please cite the accompanying project report.
+If you use this repository in your research, please cite it as:
+
+```bibtex
+@misc{kumar2026cropdisease,
+  author       = {Abhishek Kumar},
+  title        = {Design of a Lightweight Crop Disease Detection and Decision Support System for South Asia with Out-of-Distribution Detection and Verified Treatment Recommendations},
+  year         = {2026},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/myselfabk5/crop_disease_detection}},
+}
+```
 
 ## License
 
