@@ -33,22 +33,12 @@ A lightweight AI-powered crop disease diagnosis system that combines **disease c
 - Streamlit
 - Grad-CAM
 
-## Repository Structure
-
-```
-├── app.py                 # Streamlit application
-├── models/                # Trained model weights
-├── utils/                 # Utility functions
-├── data/                  # Dataset (not included)
-├── images/                # Screenshots
-└── requirements.txt
-```
 
 ## Installation
 
 ```bash
-git clone <repository-url>
-cd <repository-name>
+git clone git clone https://github.com/myselfabk5/crop_disease_detection.git
+cd crop_disease_detection
 
 pip install -r requirements.txt
 ```
