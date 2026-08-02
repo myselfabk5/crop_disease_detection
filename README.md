@@ -63,6 +63,11 @@ If you use this repository in your research, please cite it as:
 }
 ```
 
+## 📞 Contact
+
+Questions, feedback, and contributions are always welcome. Feel free to open an issue in this repository or reach out via email at **myselfabk5@gmail.com**.
+
+
 ## License
 
 This project is intended for educational and research purposes.
