@@ -21,7 +21,7 @@ A lightweight AI-powered crop disease diagnosis system that combines **disease c
 ## Dataset
 
 - 94 crop disease classes
-- 13 crop species
+- 14 crop species
 - Dataset: https://huggingface.co/datasets/Saon110/bd-crop-vegetable-plant-disease-dataset
 
 ## Tech Stack
