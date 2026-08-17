@@ -1,4 +1,4 @@
-# 🌱 Lightweight Crop Disease Detection System
+# 🌱 Design of a Lightweight Crop Disease Detection and Decision Support System for South Asia with Out-of-Distribution Detection and Verified Treatment Recommendations
 
 A lightweight AI-powered crop disease diagnosis system that combines **disease classification**, **out-of-distribution (OOD) detection**, **Grad-CAM explainability**, and **verified treatment recommendations** for reliable agricultural decision support.
 
